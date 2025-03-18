@@ -8,7 +8,7 @@ $$J(\theta) = E_{\tau \sim p_\theta(\tau)}\left[\sum_{t=0}^{T} \gamma^t r_t\righ
 
 where $\theta$ represents the policy parameters, $\tau$ is a trajectory, $p_\theta(\tau)$ is the probability of that trajectory under policy $\theta$, $r_t$ is the reward at time $t$, and $\gamma$ is the discount factor.
 
-This repository compares different optimization methods for this objective, specifically the Cross-Entropy Method (CEM) and REINFORCE, on continuous control tasks. We investigate how these methods perform with various hyperparameter settings and analyze their sample efficiency and computational requirements.
+This repository compares different optimization methods for this objective, specifically the Cross-Entropy Method (CEM) and REINFORCE, on continuous control tasks. We aim to follow rigorous empirical protocole (Patterson et al., 2023) as well as understanding key policy updates behaviours in policy gradient algorithms. 
 
 ## Optimization Methods
 
