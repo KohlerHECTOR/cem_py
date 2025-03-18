@@ -130,6 +130,18 @@ The plot shows the RL objective (expected return) as a function of the walltime 
 
 We can now identify the best hyperparameters like in (Petterson et al., 2023) and fit each baseline with its best hyperparameters on more seeds (15 new random seeds).
 
+## Best Hyperparameters
+
+Based on our hyperparameter sweep, we identified the following best configurations for each algorithm:
+
+| Algorithm | Best Configuration | Average Return |
+|-----------|-------------------|----------------|
+| CEM | Population size: 16, Elite proportion: 0.125 | -136.3013 |
+| REINFORCE | Learning rate: 0.001, Batch size: 64 | -347.9129 |
+| REINFORCE+baseline | Learning rate: 0.001, Batch size: 64 | -344.9262 |
+
+These best configurations were then used for our final evaluation across 15 additional random seeds to ensure robust performance assessment.
+
 ## References
 
 - Williams, R. J. (1992). Simple statistical gradient-following algorithms for connectionist reinforcement learning. Machine Learning, 8(3-4), 229-256.
