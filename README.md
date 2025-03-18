@@ -97,9 +97,8 @@ We conducted a grid search over the following hyperparameters for each algorithm
 
 | Parameter | Values |
 |-----------|--------|
-| Number of evaluations per policy in population | 1, 2, 50 |
 | Elite proportion | 0.125, 0.25 |
-| Population size | 64 (fixed) |
+| Population size | 8 16 32 64 |
 
 **REINFORCE Hyperparameters:**
 

@@ -96,7 +96,7 @@ def cem(
     gamma=0.99,  # Added gamma parameter
 ):
     # Create a unique folder name based on parameters
-    folder_name = f"temp_beta_cem_data_Pendulum-v1_std_pop{n_pop}_size{size}_evals{n_evals}_elite{elite_prop}_seed{seed}"
+    folder_name = f"beta_cem_data_Pendulum-v1_std_pop{n_pop}_size{size}_evals{n_evals}_elite{elite_prop}_seed{seed}"
     os.makedirs(folder_name, exist_ok=True)
     base_steps = 100 * 64 * 50  # baseline: 100 iterations with batch_size=64, n_evals=50
     n_iters = int(base_steps / (n_pop * n_evals))
