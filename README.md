@@ -4,7 +4,7 @@
 
 Reinforcement Learning (RL) aims to maximize the expected sum of discounted rewards, known as the RL objective:
 
-$J(\theta) = \mathbb{E}_{\tau \sim p_\theta(\tau)}\left[\sum_{t=0}^{T} \gamma^t r_t\right]$
+$J(\theta) = E_{\tau \sim p_\theta(\tau)}\left[\sum_{t=0}^{T} \gamma^t r_t\right]$
 
 where $\theta$ represents the policy parameters, $\tau$ is a trajectory, $p_\theta(\tau)$ is the probability of that trajectory under policy $\theta$, $r_t$ is the reward at time $t$, and $\gamma$ is the discount factor.
 
