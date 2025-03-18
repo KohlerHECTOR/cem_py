@@ -142,6 +142,8 @@ Based on our hyperparameter sweep, we identified the following best configuratio
 
 These best configurations were then used for our final evaluation across 15 additional random seeds to ensure robust performance assessment.
 
+![Final comparison of CEM, REINFORCE, and REINFORCE with baseline](pendulum_best_hp_plot.png)
+
 ## References
 
 - Williams, R. J. (1992). Simple statistical gradient-following algorithms for connectionist reinforcement learning. Machine Learning, 8(3-4), 229-256.
