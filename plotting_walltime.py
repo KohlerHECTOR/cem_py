@@ -41,12 +41,12 @@ plt.figure(figsize=(10, 7))
 
 # Plot CEM data
 c_idx = 0
-combs = np.linspace(0, 1, 1*3*2)
+combs = np.linspace(0, 1, 1*4*2)
 for i, std_ in enumerate([True]):
-    for j, evals in enumerate([1, 2, 50]):
+    for j, n_pop in enumerate([8, 16, 32, 64]):
         for k, elite in enumerate([0.125, 0.25]):
             data_paths = [
-                f'beta_cem_data_Pendulum-v1_{"" if not std_ else "std_"}pop64_size16_evals{evals}_elite{elite}_seed{seed}/training_data_iter.npy'
+                f'beta_cem_data_Pendulum-v1_{"" if not std_ else "std_"}pop{n_pop}_size16_evals50_elite{elite}_seed{seed}/training_data_iter.npy'
                 for seed in range(3)
             ]
             # Use only the second half of the inferno colormap

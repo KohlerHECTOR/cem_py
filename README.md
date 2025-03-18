@@ -66,7 +66,7 @@ def cem_update(policy_population, env, n_evals, elite_fraction):
     new_std = std(elite_population, axis=0)
     policy_population = random.multivariate_gaussian(mean=new_mean, cov=diag(new_std), size=len(policy_population))
 ```
-
+![Teaser](policy_evolution.gif)
 ## Experimental Setting
 The goal of our experiments is to explain the performance gap between CEM (direct policy optimization) and REINFORCE (policy gradient ascent) when it comes to fitting a Beta policy to control a Pendulum. For that, follow the recommendations from (Patterson et al., 2023) for experimentation in Deep RL.
 ### Policy Representation
