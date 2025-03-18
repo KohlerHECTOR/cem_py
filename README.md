@@ -124,6 +124,10 @@ After conducting the hyperparameter sweep, we plotted the performance of all con
 
 The plot shows the RL objective (expected return) as a function of the total number of environment samples used during training.
 
+![Training time comparison of CEM, REINFORCE, and REINFORCE with baseline](pendulum_plot_walltime.png)
+
+The plot shows the RL objective (expected return) as a function of the walltime in seconds during training.
+
 We can now identify the best hyperparameters like in (Petterson et al., 2023) and fit each baseline with its best hyperparameters on more seeds (15 new random seeds).
 
 ## References
