@@ -97,7 +97,6 @@ plt.ylabel("RL Objective", fontsize=22)
 # Increase tick label sizes
 plt.xticks(fontsize=14)
 plt.yticks(fontsize=20)
-plt.xlim(0, 1800)
 
 # Add more bottom margin to accommodate the legend
 plt.tight_layout()
