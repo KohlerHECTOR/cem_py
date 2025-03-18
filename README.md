@@ -4,7 +4,7 @@
 
 Reinforcement Learning (RL) aims to maximize the expected sum of discounted rewards, known as the RL objective:
 
-$$J(\theta) = \mathbb{E}_{\tau \sim p_\theta(\tau)}\left[\sum_{t=0}^{T} \gamma^t r_t\right]$$
+$J(\theta) = \mathbb{E}_{\tau \sim p_\theta(\tau)}\left[\sum_{t=0}^{T} \gamma^t r_t\right]$
 
 where $\theta$ represents the policy parameters, $\tau$ is a trajectory, $p_\theta(\tau)$ is the probability of that trajectory under policy $\theta$, $r_t$ is the reward at time $t$, and $\gamma$ is the discount factor.
 
@@ -68,7 +68,7 @@ def cem_update(policy_population, env, n_evals, elite_fraction):
 ```
 
 ## Experimental Setting
-
+The goal of our experiments is to explain the performance gap between CEM (direct policy optimization) and REINFORCE (policy gradient ascent) when it comes to fitting a Beta policy to control a Pendulum. For that, follow the recommendations from (Patterson et al., 2023) for experimentation in Deep RL.
 ### Policy Representation
 
 We use a Beta distribution policy for continuous control, which has been shown to be effective for bounded action spaces (Chou et al., 2017). The Beta distribution naturally constrains actions to a bounded range [0,1], which can then be scaled to the environment's action range.
@@ -76,10 +76,18 @@ We use a Beta distribution policy for continuous control, which has been shown t
 Our policy network consists of:
 - Two 16 neurons hidden layers with ReLU activations
 - An output layer that parameterizes alpha and beta parameters of the Beta distribution
-
+- All policies across all algorithms are intitialized with He (He et al., 2015)initialization for comparison.
 ### Environment
 
 We use the Pendulum-v1 environment from Gymnasium, a classic continuous control problem where the agent must learn to swing up and balance an inverted pendulum.
+
+### Implementation Details
+
+For both algorithms, we implemented full parallelization to maximize computational efficiency:
+- For CEM, we parallelize the evaluation of each population member
+- For REINFORCE, we parallelize the collection of episodes within each batch
+
+This parallelization ensures that both methods can utilize available computational resources efficiently, making the comparison more focused on algorithmic differences rather than implementation details.
 
 ### Hyperparameter Search
 
@@ -109,15 +117,7 @@ We conducted a grid search over the following hyperparameters for each algorithm
 
 Each algorithm with each hyperparameter combination was trained on 3 different random seeds on identical CPU hardware to ensure fair comparison.
 
-### Implementation Details
-
-For both algorithms, we implemented full parallelization to maximize computational efficiency:
-- For CEM, we parallelize the evaluation of each population member
-- For REINFORCE, we parallelize the collection of episodes within each batch
-
-This parallelization ensures that both methods can utilize available computational resources efficiently, making the comparison more focused on algorithmic differences rather than implementation details.
-
-## Results
+## Sweep Results
 
 After conducting the hyperparameter sweep, we plotted the performance of all configurations in terms of sample efficiency. The results can be seen in the figure below:
 
@@ -125,9 +125,12 @@ After conducting the hyperparameter sweep, we plotted the performance of all con
 
 The plot shows the RL objective (expected return) as a function of the total number of environment samples used during training.
 
+We can now identify the best hyperparameters like in (Petterson et al., 2023) and fit each baseline with its best hyperparameters on more seeds (15 new random seeds).
+
 ## References
 
 - Williams, R. J. (1992). Simple statistical gradient-following algorithms for connectionist reinforcement learning. Machine Learning, 8(3-4), 229-256.
 - Rubinstein, R. (1999). The cross-entropy method for combinatorial and continuous optimization. Methodology and Computing in Applied Probability, 1(2), 127-190.
+- He, K., Zhang, X., Ren, S., & Sun, J. (2015). Delving deep into rectifiers: Surpassing human-level performance on imagenet classification. In Proceedings of the IEEE international conference on computer vision (pp. 1026-1034).
 - Chou, P. W., Maturana, D., & Scherer, S. (2017). Improving stochastic policy gradients in continuous control with deep reinforcement learning using the beta distribution. In International Conference on Machine Learning (pp. 834-843).
-- Tang, Y., & Agrawal, S. (2018). Boosting trust region policy optimization by normalizing flows policy. arXiv preprint arXiv:1809.01672.
+Patterson, A., Neumann, S., White, M., & White, A. (2024). Empirical design in reinforcement learning. Journal of Machine Learning Research, 25(318), 1-63.
