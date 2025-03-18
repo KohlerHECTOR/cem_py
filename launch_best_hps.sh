@@ -13,8 +13,8 @@ do
     
     oarsub "source cem_env/bin/activate; python3 cem_beta_pendulum.py \
         --seed ${seed} \
-        --n_evals 1 \
-        --elite_prop 0.25" \
+        --n_evals 50 \
+        --elite_prop 0.125" \
         -l nodes=2,walltime=4:00:00 \
         -p grvingt \
         -q production \
