@@ -1,0 +1,4 @@
+logs
+*.npy
+cem_env
+__pycache__
