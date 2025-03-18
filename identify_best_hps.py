@@ -43,13 +43,13 @@ def find_best_hyperparameters():
     
     # Process CEM data
     for std_ in [True]:
-        for evals in [1, 2, 50]:
+        for n_pop in [8, 16, 32, 64]:
             for elite in [0.125, 0.25]:
-                key = f"std_{std_}_evals{evals}_elite{elite}"
+                key = f"std_{std_}_pop{n_pop}_elite{elite}"
                 final_scores = []
                 
                 for seed in range(3):
-                    data_path = f'beta_cem_data_Pendulum-v1_{"" if not std_ else "std_"}pop64_size16_evals{evals}_elite{elite}_seed{seed}/training_data_iter.npy'
+                    data_path = f'beta_cem_data_Pendulum-v1_{"" if not std_ else "std_"}pop{n_pop}_size16_evals50_elite{elite}_seed{seed}/training_data_iter.npy'
                     try:
                         data = np.load(data_path, allow_pickle=True).item()
                         final_scores.append(data["train_scores"][-1])
