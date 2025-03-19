@@ -192,7 +192,7 @@ def es(
         training_data["walltime"][iters] = perf_counter() - t
     
     # Save final training data
-    save_path = os.path.join(folder_name, f"training_data_final.npy")
+    save_path = os.path.join(folder_name, f"training_data_iter.npy")
     np.save(save_path, training_data)
 
 
