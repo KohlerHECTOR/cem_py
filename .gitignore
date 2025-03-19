@@ -2,3 +2,5 @@ logs
 *.npy
 cem_env
 __pycache__
+*.stderr
+*.stdout
