@@ -477,7 +477,7 @@ def plot_policy_evolution_comparison(cem_weights_file, reinforce_weights_file, h
     frames = []
     
     # Determine how many frames to create (100 frames total)
-    num_frames = 100
+    num_frames = 400
     cem_step = max(1, cem_iterations // num_frames)
     reinforce_step = max(1, reinforce_iterations // num_frames)
     
@@ -572,7 +572,7 @@ def plot_policy_evolution_comparison(cem_weights_file, reinforce_weights_file, h
     
     # Create GIF
     print(f"Creating GIF at {output_gif}...")
-    with imageio.get_writer(output_gif, mode='I', duration=0.2) as writer:
+    with imageio.get_writer(output_gif, mode='I', duration=0.5) as writer:
         for frame_path in frames:
             image = imageio.imread(frame_path)
             writer.append_data(image)
