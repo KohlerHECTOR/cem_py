@@ -186,8 +186,7 @@ def es(
         training_data["theta"][iters] = theta
         theta += learning_rate * gradient_estimate
         # Update training data
-        total_samples += sum(episode_lengths)
-        training_data["total_samples"][iters] = total_samples
+        training_data["total_samples"][iters] = sum(episode_lengths)
         training_data["perturbation_scores"][iters] = rewards
         training_data["train_scores"][iters] = train_score
         training_data["walltime"][iters] = perf_counter() - t

@@ -4,7 +4,7 @@ import seaborn as sns
 from scipy.ndimage import gaussian_filter1d
 from matplotlib.lines import Line2D
 
-def plot_data(data_paths, line_style, color_map, alpha=0.3):
+def plot_data(data_paths, line_style, color_map, alpha=0.1):
     # Store data for calculating mean trend
     all_x_data = []
     all_y_data = []
@@ -31,7 +31,6 @@ def plot_data(data_paths, line_style, color_map, alpha=0.3):
                          color=color_map, linewidth=1, alpha=alpha)
         except FileNotFoundError:
             continue
-    
     return all_x_data, all_y_data
 
 def compute_mean_performance(x_data_list, y_data_list):
@@ -186,14 +185,40 @@ for i, lr in enumerate([0.0001, 0.001, 0.01, 0.1]):  # Adjust parameters as need
     for j, noise_std in enumerate([0.1, 1, 0.01]):  # Adjust parameters as needed
         for k, n_pop in enumerate([8, 16, 32, 64]):  # Adjust parameters as needed
             data_paths = [
-                f'beta_es_data_Pendulum-v1_pop{n_pop}_size16_evals50_lr{lr}_std{noise_std}_seed{seed}/training_data_iter.npy'
+                f'beta_es_data_Pendulum-v1_pop{n_pop}_size16_evals50_lr{lr}_std{noise_std}_seed{seed}/training_data_final.npy'
                 for seed in range(3)  # Adjust seed count as needed
             ]
             color = sns.color_palette("Purples", n_colors=len(combs)*2)[len(combs) + c_idx]
-            x_data, y_data = plot_data(data_paths, '-', color)
+            
+            # Special handling for ES data - don't use cumsum
+            all_x_data = []
+            all_y_data = []
+            
+            # Plot individual seeds for ES
+            for data_path in data_paths:
+                try:
+                    data = np.load(data_path, allow_pickle=True).item()
+                    train_scores = data["train_scores"]
+                    train_samples = data["total_samples"]  # These are already cumulative for ES
+                    
+                    num_points = 100
+                    indices = np.linspace(0, train_scores.shape[0] - 1, num_points, dtype=int)
+                    
+                    train_scores = train_scores[indices]
+                    train_samples_es = train_samples[indices]  # Use directly without cumsum
+                    
+                    # Store data for mean calculation
+                    all_x_data.append(train_samples_es)
+                    all_y_data.append(train_scores)
+                    
+                    # Plot individual seed
+                    sns.lineplot(x=train_samples_es, y=train_scores, linestyle='-', 
+                                color=color, linewidth=1, alpha=0.1)
+                except FileNotFoundError:
+                    continue
             
             # Compute mean performance for this hyperparameter configuration
-            config_x, config_y, config_score = compute_mean_performance(x_data, y_data)
+            config_x, config_y, config_score = compute_mean_performance(all_x_data, all_y_data)
             
             # Check if this is the best configuration
             if config_score > new_baseline_best_config_score:
@@ -201,8 +226,8 @@ for i, lr in enumerate([0.0001, 0.001, 0.01, 0.1]):  # Adjust parameters as need
                 new_baseline_best_config_x = config_x
                 new_baseline_best_config_y = config_y
             
-            new_baseline_x_data.extend(x_data)
-            new_baseline_y_data.extend(y_data)
+            new_baseline_x_data.extend(all_x_data)
+            new_baseline_y_data.extend(all_y_data)
             c_idx += 1
 
 # Plot global trends for each algorithm
