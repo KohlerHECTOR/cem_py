@@ -113,8 +113,6 @@ def es(
     base_steps = 100 * 64 * 50  # baseline: 100 iterations with batch_size=64, n_evals=50
     n_iters = int(base_steps / (n_pop * n_evals))
 
-    # Set random seed for reproducibility
-    np.random.seed(seed)
     
     # Create environments
     envs = [make("Pendulum-v1") for _ in range(n_pop)]
