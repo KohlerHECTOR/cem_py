@@ -80,6 +80,8 @@ reinforce_x_data = []
 reinforce_y_data = []
 reinforce_baseline_x_data = []
 reinforce_baseline_y_data = []
+new_baseline_x_data = []
+new_baseline_y_data = []
 
 # Store best hyperparameter configurations
 cem_best_config_x = None
@@ -93,6 +95,10 @@ reinforce_best_config_score = float('-inf')
 reinforce_baseline_best_config_x = None
 reinforce_baseline_best_config_y = None
 reinforce_baseline_best_config_score = float('-inf')
+
+new_baseline_best_config_x = None
+new_baseline_best_config_y = None
+new_baseline_best_config_score = float('-inf')
 
 # Plot CEM data
 c_idx = 0
@@ -173,6 +179,32 @@ for i, lr in enumerate([0.0001, 0.001, 0.01, 0.1]):
             reinforce_baseline_y_data.extend(y_data)
             c_idx += 1
 
+# Plot new baseline data
+c_idx = 0
+combs = np.linspace(0, 1, 4*3*4)  # Adjust based on your parameter combinations
+for i, lr in enumerate([0.0001, 0.001, 0.01, 0.1]):  # Adjust parameters as needed
+    for j, noise_std in enumerate([0.1, 1, 0.01]):  # Adjust parameters as needed
+        for k, n_pop in enumerate([8, 16, 32, 64]):  # Adjust parameters as needed
+            data_paths = [
+                f'beta_es_data_Pendulum-v1_pop{n_pop}_size16_evals50_lr{lr}_std{noise_std}_seed{seed}/training_data_iter.npy'
+                for seed in range(3)  # Adjust seed count as needed
+            ]
+            color = sns.color_palette("Purples", n_colors=len(combs)*2)[len(combs) + c_idx]
+            x_data, y_data = plot_data(data_paths, '-', color)
+            
+            # Compute mean performance for this hyperparameter configuration
+            config_x, config_y, config_score = compute_mean_performance(x_data, y_data)
+            
+            # Check if this is the best configuration
+            if config_score > new_baseline_best_config_score:
+                new_baseline_best_config_score = config_score
+                new_baseline_best_config_x = config_x
+                new_baseline_best_config_y = config_y
+            
+            new_baseline_x_data.extend(x_data)
+            new_baseline_y_data.extend(y_data)
+            c_idx += 1
+
 # Plot global trends for each algorithm
 def plot_global_trend(x_data, y_data, color, label):
     if len(x_data) > 1:
@@ -198,6 +230,7 @@ def plot_global_trend(x_data, y_data, color, label):
 plot_global_trend(cem_x_data, cem_y_data, '#e85c47', 'CEM (global)')
 plot_global_trend(reinforce_x_data, reinforce_y_data, '#4878cf', 'REINFORCE (global)')
 plot_global_trend(reinforce_baseline_x_data, reinforce_baseline_y_data, '#2ca02c', 'REINFORCE+baseline (global)')
+plot_global_trend(new_baseline_x_data, new_baseline_y_data, '#9467bd', 'ES (global)')
 
 # Plot best hyperparameter configurations for each algorithm with dotted lines
 if cem_best_config_x is not None and cem_best_config_y is not None:
@@ -209,6 +242,9 @@ if reinforce_best_config_x is not None and reinforce_best_config_y is not None:
 if reinforce_baseline_best_config_x is not None and reinforce_baseline_best_config_y is not None:
     plt.plot(reinforce_baseline_best_config_x, reinforce_baseline_best_config_y, linestyle='dashed', color='#2ca02c', linewidth=4, label='REINFORCE+baseline (best config)')
 
+if new_baseline_best_config_x is not None and new_baseline_best_config_y is not None:
+    plt.plot(new_baseline_best_config_x, new_baseline_best_config_y, linestyle='dashed', color='#9467bd', linewidth=4, label='ES (best config)')
+
 # Update legend with best configurations
 legend_elements = [
     Line2D([0], [0], color='#e85c47', lw=3, label='CEM (global)'),
@@ -216,9 +252,11 @@ legend_elements = [
     Line2D([0], [0], color='#4878cf', lw=3, label='REINFORCE (global)'),
     Line2D([0], [0], color='#4878cf', linestyle='dashed', lw=3, label='REINFORCE (best config)'),
     Line2D([0], [0], color='#2ca02c', lw=3, label='REINFORCE+baseline (global)'),
-    Line2D([0], [0], color='#2ca02c', linestyle='dashed', lw=3, label='REINFORCE+baseline (best config)')
+    Line2D([0], [0], color='#2ca02c', linestyle='dashed', lw=3, label='REINFORCE+baseline (best config)'),
+    Line2D([0], [0], color='#9467bd', lw=3, label='ES (global)'),
+    Line2D([0], [0], color='#9467bd', linestyle='dashed', lw=3, label='ES (best config)')
 ]
-plt.legend(handles=legend_elements, fontsize=13.4, loc='upper center', bbox_to_anchor=(0.5, -0.12), ncol=3)
+plt.legend(handles=legend_elements, fontsize=11, loc='upper center', bbox_to_anchor=(0.5, -0.12), ncol=4)
 
 # Increase font sizes for better readability
 plt.xlabel("Total Samples", fontsize=22)
