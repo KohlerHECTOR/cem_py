@@ -162,7 +162,6 @@ def cem(
         training_data["population_scores"][iters] = pop_mean_rewards
         training_data["best_pop_idx"][iters] = elite_indices[-1]
         training_data["train_scores"][iters] = pop_mean_rewards[elite_indices[-1]]
-        print(training_data["train_scores"][iters])
         # population = np.random.multivariate_normal(
         #     mean=mean_new_pop, cov=cov_new_pop, size=n_pop
         # )
