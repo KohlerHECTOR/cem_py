@@ -83,6 +83,12 @@ reinforce_baseline_data_paths = [
 ]
 plot_data(reinforce_baseline_data_paths, '-', '#2ca02c', 'REINFORCE+baseline', ax1, ax2)
 
+es_data_paths = [
+    f'beta_es_data_Pendulum-v1_pop8_size16_evals50_lr0.01_std0.1_seed{seed}/training_data_final.npy'
+    for seed in range(3, 3 + 15)
+]
+plot_data(es_data_paths, '-', 'purple', 'ES', ax1, ax2)
+
 # Set labels for first subplot
 ax1.set_xlabel("Total Samples", fontsize=22)
 ax1.set_ylabel("RL Objective", fontsize=22)
