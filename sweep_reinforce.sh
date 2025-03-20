@@ -2,7 +2,7 @@
 
 # Arrays of parameters to sweep
 seeds=(0 1 2)
-batch_sizes=(16 32 64 128)
+batch_sizes=(8 16 32 64 128 256)
 learning_rates=(0.0001 0.001 0.01 0.1)
 
 # Create a logs directory if it doesn't exist
@@ -24,7 +24,7 @@ do
                 --seed ${seed} \
                 --batch_size ${batch_size} \
                 --lr ${lr}" \
-                -l nodes=3,walltime=4:00:00 \
+                -l nodes=4,walltime=4:00:00 \
                 -p grvingt \
                 -q production \
                 -n "${job_name}" \

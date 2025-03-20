@@ -2,7 +2,7 @@
 
 # Arrays of parameters to sweep
 seeds=(0 1 2)
-n_pops=(8 16 32 64)
+n_pops=(8 16 32 64 128 256)
 elite_props=(0.125 0.250 0.5)
 
 # Create a logs directory if it doesn't exist
