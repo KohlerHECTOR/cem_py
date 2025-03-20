@@ -1,4 +1,2 @@
 gymnasium
 joblib
-seaborn
-scikit-learn

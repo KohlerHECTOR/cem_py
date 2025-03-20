@@ -71,7 +71,7 @@ def cem_update(policy_population, env, n_evals, elite_fraction):
     new_std = std(elite_population, axis=0)
     policy_population = random.multivariate_gaussian(mean=new_mean, cov=diag(new_std), size=len(policy_population))
 ```
-![Teaser](policy_evolution.gif)
+![Teaser](plotting/policy_evolution.gif)
 ## Experimental Setting
 The goal of our experiments is to explain the performance gap between CEM (direct policy optimization) and REINFORCE (policy gradient ascent) when it comes to fitting a Beta policy to control a Pendulum. For that, follow the recommendations from (Patterson et al., 2023) for experimentation in Deep RL.
 ### Policy Representation
@@ -125,11 +125,11 @@ Each algorithm with each hyperparameter combination was trained on 3 different r
 
 After conducting the hyperparameter sweep, we plotted the performance of all configurations in terms of sample efficiency. The results can be seen in the figure below:
 
-![Performance comparison of CEM, REINFORCE, and REINFORCE with baseline](pendulum_plot.png)
+![Performance comparison of CEM, REINFORCE, and REINFORCE with baseline](plotting/pendulum_plot.png)
 
 The plot shows the RL objective (expected return) as a function of the total number of environment samples used during training.
 
-![Training time comparison of CEM, REINFORCE, and REINFORCE with baseline](pendulum_plot_walltime.png)
+![Training time comparison of CEM, REINFORCE, and REINFORCE with baseline](plotting/pendulum_plot_walltime.png)
 
 The plot shows the RL objective (expected return) as a function of the walltime in seconds during training.
 
@@ -147,7 +147,7 @@ Based on our hyperparameter sweep, we identified the following best configuratio
 
 These best configurations were then used for our final evaluation across 15 additional random seeds to ensure robust performance assessment.
 
-![Final comparison of CEM, REINFORCE, and REINFORCE with baseline](pendulum_best_hp_plot.png)
+![Final comparison of CEM, REINFORCE, and REINFORCE with baseline](plotting/pendulum_best_hp_plot.png)
 
 ## References
 
