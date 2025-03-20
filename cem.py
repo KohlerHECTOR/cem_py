@@ -13,7 +13,7 @@ import argparse
 
 def cem(elite_prop=0.125, batch_size=32, seed=0):
     np.random.seed(seed)
-    num_iterations = 1
+    num_iterations = total_iters_budget // (batch_size * 50)
     envs = [make("Pendulum-v1") for _ in range(batch_size)]
 
     population_weights = [init_policy_params() for _ in range(batch_size)]

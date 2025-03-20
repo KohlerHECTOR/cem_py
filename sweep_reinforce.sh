@@ -2,8 +2,7 @@
 
 # Arrays of parameters to sweep
 seeds=(0 1 2)
-n_evals=(1 2 50)
-batch_sizes=(8 16 32 64)
+batch_sizes=(16 32 64 128)
 learning_rates=(0.0001 0.001 0.01 0.1)
 
 # Create a logs directory if it doesn't exist
@@ -12,21 +11,20 @@ mkdir -p logs
 # Loop through all combinations
 for seed in "${seeds[@]}"
 do
-    for n_eval in "${n_evals[@]}"
+    for batch_size in "${batch_sizes[@]}"
     do
         for lr in "${learning_rates[@]}"
         do
-            echo "Launching training with seed ${seed}, n_evals ${n_eval}, lr ${lr}"
+            echo "Launching training with seed ${seed}, n_evals ${batch_size}, lr ${lr}"
             
             # Create a unique job name
-            job_name="reinforce_s${seed}_e${n_eval}_lr${lr}_eps${init_eps}"
+            job_name="reinforce_s${seed}_e${batch_size}_lr${lr}"
             
-            oarsub "source cem_env/bin/activate; python3 reinforce_beta_pendulum.py \
+            oarsub "source cem_env/bin/activate; python3 reinforce.py \
                 --seed ${seed} \
-                --n_evals ${n_eval} \
                 --batch_size ${batch_size} \
                 --lr ${lr}" \
-                -l nodes=2,walltime=4:00:00 \
+                -l nodes=3,walltime=4:00:00 \
                 -p grvingt \
                 -q production \
                 -n "${job_name}" \
