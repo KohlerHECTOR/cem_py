@@ -1,5 +1,10 @@
 # Reinforcement Learning Optimization Methods Comparison
 
+## Why this project ?
+What is the objective of RL in society ? How does the latter determine the objective of RL in research ? What question specifically about RL research do we want to answer ? What experiment do we design to answer this question ? What tools do we use for our experiment ? What specific optimization problem do we solve ? What scores do we report ?
+
+## What is the best way to learn a $Beta$ policy that maximizes the episodic **un**discunted reward of the Pendulum?
+
 ## Introduction
 
 Reinforcement Learning (RL) aims to maximize the expected sum of discounted rewards, known as the RL objective:
