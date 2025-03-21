@@ -99,7 +99,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='ES algorithm for Pendulum-v1')
     parser.add_argument('--lr', type=float, default=0.01, help='Learning rate')
     parser.add_argument('--batch_size', type=int, default=64, help='Batch size')
-    parser.add_argument('--noise_std', type=int, default=0.1, help='noise')
+    parser.add_argument('--noise_std', type=float, default=0.1, help='noise')
     parser.add_argument('--seed', type=int, default=0, help='Random seed')
     args = parser.parse_args()
     es(lr=args.lr, batch_size=args.batch_size, noise_std=args.noise_std, seed=args.seed)
