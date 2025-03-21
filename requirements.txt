@@ -1,2 +1,3 @@
 gymnasium
 joblib
+matplotlib

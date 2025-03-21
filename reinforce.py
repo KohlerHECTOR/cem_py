@@ -11,8 +11,13 @@ from joblib import Parallel, delayed
 from scipy.special import digamma
 import argparse
 
+def clip_grad_norm(grad):
+    grad_norm = np.sqrt(np.sum(grad ** 2))
+    if grad_norm > 1.0:
+        return grad * (1.0 / (grad_norm + 1e-8))
+    return grad
 
-def reinforce(lr=0.01, batch_size=64, seed=0):
+def reinforce(lr=0.01, batch_size=64, clip=False, seed=0):
     np.random.seed(seed)
     num_iterations = total_iters_budget // batch_size
     envs = [make("Pendulum-v1") for _ in range(batch_size)]
@@ -105,17 +110,17 @@ def reinforce(lr=0.01, batch_size=64, seed=0):
         grad_w1 = all_states.T @ dh1  # (3, 16)
         grad_b1 = dh1.sum(axis=0)  # (16,)
 
-        # Store gradients in the correct order and shape
-        # grads = np.concatenate([
-        #     grad_w1.flatten(),  # 3 * 16 = 48
-        #     grad_b1.flatten(),  # 16
-        #     grad_w2.flatten(),  # 16 * 16 = 256
-        #     grad_b2.flatten(),  # 16
-        #     grad_w3.flatten(),  # 16 * 2 = 32
-        #     grad_b3.flatten()   # 2
-        # ])  # Total: 370 parameters
-
         # Parameter updates
+        # Add gradient norm clipping
+        if clip:            
+            # Apply gradient norm clipping
+            grad_w1 = clip_grad_norm(grad_w1)
+            grad_b1 = clip_grad_norm(grad_b1)
+            grad_w2 = clip_grad_norm(grad_w2)
+            grad_b2 = clip_grad_norm(grad_b2)
+            grad_w3 = clip_grad_norm(grad_w3)
+            grad_b3 = clip_grad_norm(grad_b3)
+            
         w3 = w3 + lr * grad_w3
         b3 = b3 + lr * grad_b3
         w2 = w2 + lr * grad_w2
@@ -123,7 +128,7 @@ def reinforce(lr=0.01, batch_size=64, seed=0):
         w1 = w1 + lr * grad_w1
         b1 = b1 + lr * grad_b1
 
-    np.save(f"results_reinforce_lr{lr}_batch_size{batch_size}_seed{seed}.npy", results)
+    np.save(f"results_reinforce_lr{lr}_batch_size{batch_size}_clip{clip}_seed{seed}.npy", results)
 
     for env in envs:
         env.close()
@@ -133,6 +138,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="REINFORCE algorithm for Pendulum-v1")
     parser.add_argument("--lr", type=float, default=0.01, help="Learning rate")
     parser.add_argument("--batch_size", type=int, default=64, help="Batch size")
+    parser.add_argument("--clip", action="store_true", help="Whether to clip gradients")
     parser.add_argument("--seed", type=int, default=0, help="Random seed")
     args = parser.parse_args()
     reinforce(lr=args.lr, batch_size=args.batch_size, seed=args.seed)
