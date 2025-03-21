@@ -1,3 +1,5 @@
 gymnasium
 joblib
 matplotlib
+scipy
+seaborn
