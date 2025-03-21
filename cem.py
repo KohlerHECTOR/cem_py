@@ -86,7 +86,7 @@ def cem(elite_prop=0.125, batch_size=32, seed=0):
 
     np.save(
         f"results_cem_elite_prop{elite_prop}_batch_size{batch_size}_seed{seed}.npy",
-        results
+        results,
     )
     for env in envs:
         env.close()
@@ -94,16 +94,23 @@ def cem(elite_prop=0.125, batch_size=32, seed=0):
 
 if __name__ == "__main__":
     # Set up argument parser
-    parser = argparse.ArgumentParser(description='Cross-Entropy Method for Pendulum-v1')
-    parser.add_argument('--elite_prop', type=float, default=0.125,
-                        help='Proportion of elite samples (default: 0.125)')
-    parser.add_argument('--batch_size', type=int, default=16,
-                        help='Batch size for evaluation (default: 16)')
-    parser.add_argument('--seed', type=int, default=0,
-                        help='Random seed (default: 0)')
-    
+    parser = argparse.ArgumentParser(description="Cross-Entropy Method for Pendulum-v1")
+    parser.add_argument(
+        "--elite_prop",
+        type=float,
+        default=0.125,
+        help="Proportion of elite samples (default: 0.125)",
+    )
+    parser.add_argument(
+        "--batch_size",
+        type=int,
+        default=16,
+        help="Batch size for evaluation (default: 16)",
+    )
+    parser.add_argument("--seed", type=int, default=0, help="Random seed (default: 0)")
+
     # Parse arguments
     args = parser.parse_args()
-    
+
     # Run CEM with parsed arguments
     cem(elite_prop=args.elite_prop, batch_size=args.batch_size, seed=args.seed)

@@ -124,15 +124,15 @@ def reinforce(lr=0.01, batch_size=64, seed=0):
         b1 = b1 + lr * grad_b1
 
     np.save(f"results_reinforce_lr{lr}_batch_size{batch_size}_seed{seed}.npy", results)
-    
+
     for env in envs:
         env.close()
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='REINFORCE algorithm for Pendulum-v1')
-    parser.add_argument('--lr', type=float, default=0.01, help='Learning rate')
-    parser.add_argument('--batch_size', type=int, default=64, help='Batch size')
-    parser.add_argument('--seed', type=int, default=0, help='Random seed')
+    parser = argparse.ArgumentParser(description="REINFORCE algorithm for Pendulum-v1")
+    parser.add_argument("--lr", type=float, default=0.01, help="Learning rate")
+    parser.add_argument("--batch_size", type=int, default=64, help="Batch size")
+    parser.add_argument("--seed", type=int, default=0, help="Random seed")
     args = parser.parse_args()
     reinforce(lr=args.lr, batch_size=args.batch_size, seed=args.seed)

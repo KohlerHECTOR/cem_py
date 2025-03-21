@@ -10,6 +10,7 @@ from gymnasium import make
 from joblib import Parallel, delayed
 import argparse
 
+
 def es(lr=0.01, noise_std=0.1, batch_size=32, seed=0):
     np.random.seed(seed)
     num_iterations = total_iters_budget // (batch_size * 50)
@@ -89,17 +90,18 @@ def es(lr=0.01, noise_std=0.1, batch_size=32, seed=0):
         print(f"Steps: {tot_steps} - score: {train_score}")
 
     np.save(
-        f"results_es_lr{lr}_noise_std{noise_std}_batch_size{batch_size}_seed{seed}.npy", results
+        f"results_es_lr{lr}_noise_std{noise_std}_batch_size{batch_size}_seed{seed}.npy",
+        results,
     )
     for env in envs:
         env.close()
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='ES algorithm for Pendulum-v1')
-    parser.add_argument('--lr', type=float, default=0.01, help='Learning rate')
-    parser.add_argument('--batch_size', type=int, default=64, help='Batch size')
-    parser.add_argument('--noise_std', type=float, default=0.1, help='noise')
-    parser.add_argument('--seed', type=int, default=0, help='Random seed')
+    parser = argparse.ArgumentParser(description="ES algorithm for Pendulum-v1")
+    parser.add_argument("--lr", type=float, default=0.01, help="Learning rate")
+    parser.add_argument("--batch_size", type=int, default=64, help="Batch size")
+    parser.add_argument("--noise_std", type=float, default=0.1, help="noise")
+    parser.add_argument("--seed", type=int, default=0, help="Random seed")
     args = parser.parse_args()
     es(lr=args.lr, batch_size=args.batch_size, noise_std=args.noise_std, seed=args.seed)
