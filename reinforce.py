@@ -141,4 +141,4 @@ if __name__ == "__main__":
     parser.add_argument("--clip", action="store_true", help="Whether to clip gradients")
     parser.add_argument("--seed", type=int, default=0, help="Random seed")
     args = parser.parse_args()
-    reinforce(lr=args.lr, batch_size=args.batch_size, seed=args.seed)
+    reinforce(lr=args.lr, batch_size=args.batch_size, clip=args.clip, seed=args.seed)
