@@ -24,7 +24,7 @@ axes = [ax1, ax2, ax3]
 cem_curves = []  # Store (final_return, plot_data) for alpha calculation
 success, fail = 0, 0
 for p in [8, 16, 32, 64, 128, 256]:
-    for prop in [0.125, 0.25, 0.5]:
+    for prop in [0.05, 0.1, 0.125, 0.25, 0.5]:
         to_plot_x = []
         to_plot_y = []
         for s in [0, 1, 2]:
@@ -60,17 +60,14 @@ if cem_curves:
 reinforce_curves = []
 success, fail = 0, 0
 
-for bs in [8, 16, 32, 64, 128]:
+for bs in [1, 2, 4, 8, 16, 32, 64, 128]:
     for lr in [0.0001, 0.001, 0.01, 0.1]:
-        for clip in [True, False]:
+        for clip in [False, True]:
             to_plot_x = []
             to_plot_y = []
             for s in [0, 1, 2]:
                 try:
-                    if clip:
-                        a = np.load(f"results_sweep/results_reinforce_lr{lr}_batch_size{bs}_clip{True}_seed{s}.npy")
-                    else:
-                        a = np.load(f"results_sweep/results_reinforce_lr{lr}_batch_size{bs}_seed{s}.npy")
+                    a = np.load(f"results_sweep/results_reinforce_lr{lr}_batch_size{bs}_clip{clip}_seed{s}.npy")
                     valid_mask = ~(np.isnan(a[:, 1]) | np.isinf(a[:, 1])) & (a[:, 1] < 0)
                     if not np.all(valid_mask):
                         raise FileNotFoundError
@@ -100,8 +97,8 @@ if reinforce_curves:
 # Process ES results with updated styling
 success, fail = 0, 0
 es_curves = []
-for bs in [8, 16, 32, 64]:
-    for lr in [0.0001, 0.001, 0.01]:
+for bs in [8, 16, 32, 64, 128, 256]:
+    for lr in [0.000001, 0.00001, 0.0001, 0.001, 0.01]:
         for noise_std in [1, 0.1, 0.01]:
             to_plot_x = []
             to_plot_y = []
@@ -115,7 +112,6 @@ for bs in [8, 16, 32, 64]:
                     to_plot_y.append(gaussian_filter1d(a[:,1], sigma=1e-4))
                     to_plot_x.append(a[:,0])
                 except FileNotFoundError:
-                    print(lr, noise_std, bs)
 
                     fail += 1
                     continue
@@ -163,12 +159,12 @@ plt.savefig("algorithm_comparison.pdf", bbox_inches='tight', dpi=300)
 
 # Create figures for each algorithm
 fig_cem, axes_cem = plt.subplots(1, 2, figsize=(12, 5))
-fig_reinforce, axes_reinforce = plt.subplots(1, 2, figsize=(12, 5))
+fig_reinforce, axes_reinforce = plt.subplots(1, 3, figsize=(15, 5))
 fig_es, axes_es = plt.subplots(1, 3, figsize=(15, 5))
 
 # CEM analysis
 batch_sizes_cem = [8, 16, 32, 64, 128, 256]
-elite_props = [0.125, 0.25, 0.5]
+elite_props = [0.05, 0.1, 0.125, 0.25, 0.5]
 
 # For batch size
 best_returns_bs = []
@@ -220,7 +216,7 @@ axes_cem[1].set_ylabel('Best Final Return')
 axes_cem[1].grid(True)
 
 # REINFORCE analysis
-batch_sizes_reinforce = [8, 16, 32, 64, 128]
+batch_sizes_reinforce = [1, 2, 4, 8, 16, 32, 64, 128]
 learning_rates = [0.0001, 0.001, 0.01, 0.1]
 
 # For batch size
@@ -257,10 +253,7 @@ for lr in learning_rates:
             returns_this_combo = []
             for s in [0, 1, 2]:
                 try:
-                    if clip:
-                        filename = f"results_sweep/results_reinforce_lr{lr}_batch_size{bs}_clip{clip}_seed{s}.npy"
-                    else:
-                        filename = f"results_sweep/results_reinforce_lr{lr}_batch_size{bs}_seed{s}.npy"
+                    filename = f"results_sweep/results_reinforce_lr{lr}_batch_size{bs}_clip{clip}_seed{s}.npy"
                     a = np.load(filename)
                     if np.all(~np.isnan(a[:, 1]) & ~np.isinf(a[:, 1]) & (a[:, 1] < 0)):
                         returns_this_combo.append(a[-1, 1])
@@ -276,9 +269,34 @@ axes_reinforce[1].set_ylabel('Best Final Return')
 axes_reinforce[1].set_xscale('log')
 axes_reinforce[1].grid(True)
 
+# Add new analysis for clipping
+clip_options = [False, True]
+best_returns_clip = []
+for clip in clip_options:
+    returns_for_clip = []
+    for bs in batch_sizes_reinforce:
+        for lr in learning_rates:
+            returns_this_combo = []
+            for s in [0, 1, 2]:
+                try:
+                    filename = f"results_sweep/results_reinforce_lr{lr}_batch_size{bs}_clip{clip}_seed{s}.npy"
+                    a = np.load(filename)
+                    if np.all(~np.isnan(a[:, 1]) & ~np.isinf(a[:, 1]) & (a[:, 1] < 0)):
+                        returns_this_combo.append(a[-1, 1])
+                except FileNotFoundError:
+                    continue
+            if len(returns_this_combo) > 0:
+                returns_for_clip.append(np.mean(returns_this_combo))
+    best_returns_clip.append(max(returns_for_clip) if returns_for_clip else np.nan)
+
+axes_reinforce[2].plot(['No Clip', 'Clip'], best_returns_clip, 'o-')
+axes_reinforce[2].set_xlabel('Gradient Clipping')
+axes_reinforce[2].set_ylabel('Best Final Return')
+axes_reinforce[2].grid(True)
+
 # ES analysis
-batch_sizes_es = [8, 16, 32, 64]
-learning_rates_es = [0.0001, 0.001, 0.01]
+batch_sizes_es = [8, 16, 32, 64, 128, 256]
+learning_rates_es = [0.000001, 0.00001, 0.0001, 0.001, 0.01]
 noise_stds = [1, 0.1, 0.01]
 
 # For batch size
