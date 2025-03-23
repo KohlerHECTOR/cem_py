@@ -1,6 +1,7 @@
 import numpy as np
 
 total_iters_budget = int(64 * 50 * 100)
+total_iters_budget_full = 2 * total_iters_budget
 
 # Define trajectory dtype
 trajectory_dtype = np.dtype(
