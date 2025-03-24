@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Arrays of parameters to sweep
-seeds=(8 9 10 11 12)
+seeds=(5 6 7 8 9 10 11 12 13 14)
 batch_sizes=(1 2 4 8 16 32)
 learning_rates=(0.0001 0.001 0.01)
 
@@ -26,7 +26,7 @@ do
                 --clip \
                 --lr ${lr}" \
                 -l nodes=1,walltime=4:00:00 \
-                -p grele \
+                -p nancy \
                 -q production \
                 -n "${job_name}" \
                 -O "logs/${job_name}.%jobid%.out" \
