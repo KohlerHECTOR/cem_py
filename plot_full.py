@@ -17,8 +17,8 @@ rcParams['ps.fonttype'] = 42
 rc('text', usetex=False)
 
 # Create figure with subplots
-fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(15, 5))
-axes = [ax1, ax2, ax3]
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
+axes = [ax1, ax2]
 
 # Process CEM results with updated styling
 cem_curves = []  # Store (final_return, plot_data) for alpha calculation
@@ -46,6 +46,26 @@ for p in [8, 16, 32, 64, 128, 256]:
             cem_curves.append((final_return, plot_data))
 print(success / (fail+success))
 
+# Plot specific combination with black color
+# specific_p, specific_prop = 128, 0.125
+# to_plot_x = []
+# to_plot_y = []
+# for s in [3, 4, 5, 6, 7, 8, 9, 10]:
+#     try:
+#         a = np.load(f"results_sweep/full_results_cem_elite_prop{specific_prop}_batch_size{specific_p}_seed{s}.npy")
+#         valid_mask = ~(np.isnan(a[:, 1]) | np.isinf(a[:, 1])) & (a[:, 1] < 0)
+#         if not np.all(valid_mask):
+#             raise FileNotFoundError
+#         to_plot_y.append(gaussian_filter1d(a[:,1], sigma=1e-4))
+#         to_plot_x.append(a[:,0])
+#     except FileNotFoundError:
+#         continue
+# if to_plot_x and to_plot_y:
+#     y_mean = np.mean(to_plot_y, axis=0)
+#     x_mean = np.mean(to_plot_x, axis=0)
+#     ax1.plot(x_mean, y_mean, c='black', linewidth=2, zorder=10)
+
+
 # Plot CEM curves with normalized alphas based on final returns
 if cem_curves:
     returns = np.array([r for r, _ in cem_curves])
@@ -62,7 +82,7 @@ success, fail = 0, 0
 
 for bs in [1, 2, 4, 8, 16, 32, 64, 128]:
     for lr in [0.0001, 0.001, 0.01, 0.1]:
-        for clip in [False, True]:
+        for clip in [True]:
             to_plot_x = []
             to_plot_y = []
             for s in [3, 4, 5, 6, 7, 8, 9, 10]:
@@ -94,47 +114,9 @@ if reinforce_curves:
         linewidth = 0.5 + 2.5 * (final_return - min_return) / (max_return - min_return) if max_return != min_return else 1.5
         ax2.plot(x, y, c='#7F7FFF', alpha=min(1, alpha), linewidth=linewidth)
 
-# Process ES results with updated styling
-success, fail = 0, 0
-es_curves = []
-for bs in [8, 16, 32, 64, 128, 256]:
-    for lr in [0.000001, 0.00001, 0.0001, 0.001, 0.01]:
-        for noise_std in [1, 0.1, 0.01]:
-            to_plot_x = []
-            to_plot_y = []
-            for s in [3, 4, 5, 6, 7, 8, 9, 10]:
-                try:
-                    a = np.load(f"full_results_sweep/results_es_lr{lr}_noise_std{noise_std}_batch_size{bs}_seed{s}.npy")
-                    valid_mask = ~(np.isnan(a[:, 1]) | np.isinf(a[:, 1])) & (a[:, 1] < 0)
-                    if not np.all(valid_mask):
-                        raise FileNotFoundError
-                    success += 1
-                    to_plot_y.append(gaussian_filter1d(a[:,1], sigma=1e-4))
-                    to_plot_x.append(a[:,0])
-                except FileNotFoundError:
-
-                    fail += 1
-                    continue
-            if to_plot_x and to_plot_y:
-                y_mean = np.mean(to_plot_y, axis=0)
-                final_return = y_mean[-1]  # Get the last point's return
-                plot_data = (np.mean(to_plot_x, axis=0), y_mean)
-                es_curves.append((final_return, plot_data))
-
-print(success / (fail+success))
-
-# Plot ES curves with normalized alphas based on final returns
-if es_curves:
-    returns = np.array([r for r, _ in es_curves])
-    min_return = np.min(returns)
-    max_return = np.max(returns)
-    for final_return, (x, y) in es_curves:
-        alpha = 0.05 + 0.95 * (final_return - min_return) / (max_return - min_return) if max_return != min_return else 0.75
-        linewidth = 0.5 + 2.5 * (final_return - min_return) / (max_return - min_return) if max_return != min_return else 1.5
-        ax3.plot(x, y, c='#AF7FAF', alpha=min(1, alpha), linewidth=linewidth)
 
 # Style each subplot
-for ax, title in zip(axes, ['CEM', 'REINFORCE', 'ES']):
+for ax, title in zip(axes, ['CEM', 'REINFORCE']):
     ax.grid(True, alpha=0.7)
     ax.spines['right'].set_visible(False)
     ax.spines['top'].set_visible(False)
@@ -150,7 +132,6 @@ fig.text(-0.01, 0.5, 'Return', va='center', rotation='vertical', fontsize=16)
 legend_elements = [
     Line2D([0], [0], color='#FF7F7F', label='CEM', linewidth=2),
     Line2D([0], [0], color='#7F7FFF', label='REINFORCE', linewidth=2),
-    Line2D([0], [0], color='#AF7FAF', label='ES', linewidth=2)
 ]
 
 plt.tight_layout()
