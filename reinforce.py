@@ -3,7 +3,7 @@ from common_utils import (
     collect_trajectory,
     get_score_batch,
     trajectory_dtype,
-    total_iters_budget,
+    total_iters_budget_full as total_iters_budget,
 )
 import numpy as np
 from gymnasium import make
@@ -128,7 +128,7 @@ def reinforce(lr=0.01, batch_size=64, clip=False, seed=0):
         w1 = w1 + lr * grad_w1
         b1 = b1 + lr * grad_b1
 
-    np.save(f"results_reinforce_lr{lr}_batch_size{batch_size}_clip{clip}_seed{seed}.npy", results)
+    np.save(f"full_results_reinforce_lr{lr}_batch_size{batch_size}_clip{clip}_seed{seed}.npy", results)
 
     for env in envs:
         env.close()

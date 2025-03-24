@@ -23,47 +23,31 @@ axes = [ax1, ax2]
 # Process CEM results with updated styling
 cem_curves = []  # Store (final_return, plot_data) for alpha calculation
 success, fail = 0, 0
-for p in [8, 16, 32, 64, 128, 256]:
-    for prop in [0.05, 0.1, 0.125, 0.25, 0.5]:
+for p in [64, 128, 256]:
+    for prop in [0.125, 0.25]:
         to_plot_x = []
         to_plot_y = []
-        for s in [3, 4, 5, 6, 7, 8, 9, 10]:
+        for s in [3, 4, 5, 6, 7, 8, 9, 10, 11, 12]:
             try:
                 a = np.load(f"results_sweep/full_results_cem_elite_prop{prop}_batch_size{p}_seed{s}.npy")
                 valid_mask = ~(np.isnan(a[:, 1]) | np.isinf(a[:, 1])) & (a[:, 1] < 0)
                 if not np.all(valid_mask):
                     raise FileNotFoundError
                 success += 1
-                to_plot_y.append(gaussian_filter1d(a[:,1], sigma=1e-4))
+                to_plot_y.append(a[:,1])
                 to_plot_x.append(a[:,0])
             except FileNotFoundError:
                 fail += 1
                 continue
         if to_plot_x and to_plot_y:
             y_mean = np.mean(to_plot_y, axis=0)
-            final_return = y_mean[-1]  # Get the last point's return
-            plot_data = (np.mean(to_plot_x, axis=0), y_mean)
+            # Calculate 90% confidence intervals (5th and 95th percentiles)
+            y_lower = np.percentile(to_plot_y, 25, axis=0)
+            y_upper = np.percentile(to_plot_y, 75, axis=0)
+            final_return = y_mean[-1]
+            plot_data = (np.mean(to_plot_x, axis=0), y_mean, y_lower, y_upper)
             cem_curves.append((final_return, plot_data))
 print(success / (fail+success))
-
-# Plot specific combination with black color
-# specific_p, specific_prop = 128, 0.125
-# to_plot_x = []
-# to_plot_y = []
-# for s in [3, 4, 5, 6, 7, 8, 9, 10]:
-#     try:
-#         a = np.load(f"results_sweep/full_results_cem_elite_prop{specific_prop}_batch_size{specific_p}_seed{s}.npy")
-#         valid_mask = ~(np.isnan(a[:, 1]) | np.isinf(a[:, 1])) & (a[:, 1] < 0)
-#         if not np.all(valid_mask):
-#             raise FileNotFoundError
-#         to_plot_y.append(gaussian_filter1d(a[:,1], sigma=1e-4))
-#         to_plot_x.append(a[:,0])
-#     except FileNotFoundError:
-#         continue
-# if to_plot_x and to_plot_y:
-#     y_mean = np.mean(to_plot_y, axis=0)
-#     x_mean = np.mean(to_plot_x, axis=0)
-#     ax1.plot(x_mean, y_mean, c='black', linewidth=2, zorder=10)
 
 
 # Plot CEM curves with normalized alphas based on final returns
@@ -71,10 +55,9 @@ if cem_curves:
     returns = np.array([r for r, _ in cem_curves])
     min_return = np.min(returns)
     max_return = np.max(returns)
-    for final_return, (x, y) in cem_curves:
-        alpha = 0.05 + 0.95 * (final_return - min_return) / (max_return - min_return) if max_return != min_return else 0.75
-        linewidth = 0.5 + 2.5 * (final_return - min_return) / (max_return - min_return) if max_return != min_return else 1.5
-        ax1.plot(x, y, c='#FF7F7F', alpha=min(1, alpha), linewidth=linewidth)
+    for final_return, (x, y, y_lower, y_upper) in cem_curves:
+        ax1.plot(x, y, c='#FF7F7F', alpha=0.8, linewidth=1)
+        ax1.fill_between(x, y_lower, y_upper, color='#FF7F7F', alpha=0.2)
 
 # Process REINFORCE results with updated styling
 reinforce_curves = []
@@ -87,20 +70,23 @@ for bs in [1, 2, 4, 8, 16, 32, 64, 128]:
             to_plot_y = []
             for s in [3, 4, 5, 6, 7, 8, 9, 10]:
                 try:
-                    a = np.load(f"full_results_sweep/results_reinforce_lr{lr}_batch_size{bs}_clip{clip}_seed{s}.npy")
+                    a = np.load(f"results_sweep/full_results_reinforce_lr{lr}_batch_size{bs}_clip{clip}_seed{s}.npy")
                     valid_mask = ~(np.isnan(a[:, 1]) | np.isinf(a[:, 1])) & (a[:, 1] < 0)
                     if not np.all(valid_mask):
+                        print("oops")
                         raise FileNotFoundError
                     success += 1
-                    to_plot_y.append(gaussian_filter1d(a[:,1], sigma=1e-4))
+                    to_plot_y.append(a[:,1])
                     to_plot_x.append(a[:,0])
                 except FileNotFoundError:
                     fail += 1
                     continue
             if to_plot_x and to_plot_y:
                 y_mean = np.mean(to_plot_y, axis=0)
-                final_return = y_mean[-1]  # Get the last point's return
-                plot_data = (np.mean(to_plot_x, axis=0), y_mean)
+                y_lower = np.percentile(to_plot_y, 25, axis=0)
+                y_upper = np.percentile(to_plot_y, 75, axis=0)
+                final_return = y_mean[-1]
+                plot_data = (np.mean(to_plot_x, axis=0), y_mean, y_lower, y_upper)
                 reinforce_curves.append((final_return, plot_data))
 print(success / (fail+success))
 
@@ -109,11 +95,9 @@ if reinforce_curves:
     returns = np.array([r for r, _ in reinforce_curves])
     min_return = np.min(returns)
     max_return = np.max(returns)
-    for final_return, (x, y) in reinforce_curves:
-        alpha = 0.05 + 0.95 * (final_return - min_return) / (max_return - min_return) if max_return != min_return else 0.75
-        linewidth = 0.5 + 2.5 * (final_return - min_return) / (max_return - min_return) if max_return != min_return else 1.5
-        ax2.plot(x, y, c='#7F7FFF', alpha=min(1, alpha), linewidth=linewidth)
-
+    for final_return, (x, y, y_lower, y_upper) in reinforce_curves:
+        ax2.plot(x, y, c='#7F7FFF', alpha=0.8, linewidth=1)
+        ax2.fill_between(x, y_lower, y_upper, color='#7F7FFF', alpha=0.2)
 
 # Style each subplot
 for ax, title in zip(axes, ['CEM', 'REINFORCE']):
@@ -136,4 +120,4 @@ legend_elements = [
 
 plt.tight_layout()
 # Adjust layout to make room for legend
-plt.savefig("algorithm_full_comparison.pdf", bbox_inches='tight', dpi=300)
+plt.savefig("algorithm_full_comparison.png", bbox_inches='tight')

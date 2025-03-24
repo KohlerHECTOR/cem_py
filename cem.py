@@ -3,7 +3,7 @@ from common_utils import (
     collect_trajectory,
     get_score_batch,
     trajectory_dtype,
-    total_iters_budget,
+    total_iters_budget_full as total_iters_budget
 )
 import numpy as np
 from gymnasium import make
@@ -85,7 +85,7 @@ def cem(elite_prop=0.125, batch_size=32, seed=0):
             population_weights.append(params)
 
     np.save(
-        f"results_cem_elite_prop{elite_prop}_batch_size{batch_size}_seed{seed}.npy",
+        f"full_results_cem_elite_prop{elite_prop}_batch_size{batch_size}_seed{seed}.npy",
         results,
     )
     for env in envs:
