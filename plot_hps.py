@@ -128,7 +128,7 @@ plt.savefig("algorithm_comparison.pdf", bbox_inches='tight', dpi=300)
 
 # Create figures for each algorithm
 fig_cem, axes_cem = plt.subplots(1, 2, figsize=(12, 5))
-fig_reinforce, axes_reinforce = plt.subplots(1, 3, figsize=(15, 5))
+fig_reinforce, axes_reinforce = plt.subplots(1, 2, figsize=(12, 5))
 
 # Style function for axes
 def style_axes(ax):
@@ -243,37 +243,11 @@ axes_reinforce[1].set_ylabel('Best Final Return', fontsize=16)
 axes_reinforce[1].set_xscale('log')
 axes_reinforce[1].grid(True)
 
-# Add new analysis for clipping
-clip_options = [False, True]
-best_returns_clip = []
-for clip in clip_options:
-    returns_for_clip = []
-    for bs in batch_sizes_reinforce:
-        for lr in learning_rates:
-            returns_this_combo = []
-            for s in [0, 1, 2]:
-                try:
-                    filename = f"results_sweep/results_reinforce_lr{lr}_batch_size{bs}_clip{clip}_seed{s}.npy"
-                    a = np.load(filename)
-                    if np.all(~np.isnan(a[:, 1]) & ~np.isinf(a[:, 1]) & (a[:, 1] < 0)):
-                        returns_this_combo.append(a[-1, 1])
-                except FileNotFoundError:
-                    continue
-            if len(returns_this_combo) > 0:
-                returns_for_clip.append(np.mean(returns_this_combo))
-    best_returns_clip.append(max(returns_for_clip) if returns_for_clip else np.nan)
-
-axes_reinforce[2].plot(['No Clip', 'Clip'], best_returns_clip, 'o-', linewidth=3)
-axes_reinforce[2].set_xlabel('Gradient Clipping', fontsize=16)
-axes_reinforce[2].set_ylabel('Best Final Return', fontsize=16)
-axes_reinforce[2].grid(True)
-
 # Style function for axes
 style_axes(axes_cem[0])
 style_axes(axes_cem[1])
 style_axes(axes_reinforce[0])
 style_axes(axes_reinforce[1])
-style_axes(axes_reinforce[2])
 
 # Save the figures
 plt.figure(fig_cem.number)
