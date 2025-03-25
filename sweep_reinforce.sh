@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Arrays of parameters to sweep
-seeds=(15 16 17 18 19 20)
+seeds=(21 22 23 24 25 26 27 28 29 30)
 batch_sizes=(2 4 8 16 32)
 learning_rates=(0.0001 0.001 0.01)
 

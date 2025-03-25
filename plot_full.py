@@ -1,5 +1,4 @@
 import numpy as np
-from scipy.ndimage import gaussian_filter1d
 import matplotlib.pyplot as plt
 import seaborn as sns
 from matplotlib import rcParams, rc
@@ -17,13 +16,13 @@ rcParams['ps.fonttype'] = 42
 rc('text', usetex=False)
 
 # Create figure with subplots
-fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5), sharey=True)
 axes = [ax1, ax2]
 
 # Process CEM results with updated styling
 cem_curves = []  # Store (final_return, plot_data) for alpha calculation
 success, fail = 0, 0
-for p in [64, 128, 256]:
+for p in [16, 32, 64, 128, 256]:
     for prop in [0.125, 0.25]:
         to_plot_x = []
         to_plot_y = []
@@ -56,19 +55,25 @@ if cem_curves:
     min_return = np.min(returns)
     max_return = np.max(returns)
     for final_return, (x, y, y_lower, y_upper) in cem_curves:
-        ax1.plot(x, y, c='#FF7F7F', alpha=0.8, linewidth=1)
-        ax1.fill_between(x, y_lower, y_upper, color='#FF7F7F', alpha=0.2)
+        # Downsample to 100 points
+        indices = np.linspace(0, len(x) - 1, 100).astype(int)
+        x_downsampled = x[indices]
+        y_downsampled = y[indices]
+        y_lower_downsampled = y_lower[indices]
+        y_upper_downsampled = y_upper[indices]
+        ax1.plot(x_downsampled, y_downsampled, c='#FF7F7F', alpha=0.8, linewidth=1)
+        # ax1.fill_between(x_downsampled, y_lower_downsampled, y_upper_downsampled, color='#FF7F7F', alpha=0.2)
 
 # Process REINFORCE results with updated styling
 reinforce_curves = []
 success, fail = 0, 0
 
-for bs in [1, 2, 4, 8, 16, 32, 64, 128]:
-    for lr in [0.0001, 0.001, 0.01, 0.1]:
+for bs in [4, 8, 16, 32]:
+    for lr in [0.0001, 0.001, 0.01]:
         for clip in [True]:
             to_plot_x = []
             to_plot_y = []
-            for s in [3, 4, 5, 6, 7, 8, 9, 10]:
+            for s in [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]:
                 try:
                     a = np.load(f"results_sweep/full_results_reinforce_lr{lr}_batch_size{bs}_clip{clip}_seed{s}.npy")
                     valid_mask = ~(np.isnan(a[:, 1]) | np.isinf(a[:, 1])) & (a[:, 1] < 0)
@@ -96,8 +101,14 @@ if reinforce_curves:
     min_return = np.min(returns)
     max_return = np.max(returns)
     for final_return, (x, y, y_lower, y_upper) in reinforce_curves:
-        ax2.plot(x, y, c='#7F7FFF', alpha=0.8, linewidth=1)
-        ax2.fill_between(x, y_lower, y_upper, color='#7F7FFF', alpha=0.2)
+        # Downsample to 100 points
+        indices = np.linspace(0, len(x) - 1, 100).astype(int)
+        x_downsampled = x[indices]
+        y_downsampled = y[indices]
+        y_lower_downsampled = y_lower[indices]
+        y_upper_downsampled = y_upper[indices]
+        ax2.plot(x_downsampled, y_downsampled, c='#7F7FFF', alpha=0.8, linewidth=1)
+        # ax2.fill_between(x_downsampled, y_lower_downsampled, y_upper_downsampled, color='#7F7FFF', alpha=0.2)
 
 # Style each subplot
 for ax, title in zip(axes, ['CEM', 'REINFORCE']):

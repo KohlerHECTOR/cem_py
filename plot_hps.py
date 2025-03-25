@@ -12,8 +12,8 @@ def style_axes(ax):
     ax.tick_params(axis='both', which='major', length=6)      # Make tick marks longer
 
 # CEM analysis
-batch_sizes_cem = [8, 16, 32, 64, 128, 256]
-elite_props = [0.05, 0.1, 0.125, 0.25, 0.5]
+batch_sizes_cem = [16, 32, 64, 128, 256]
+elite_props = [0.1, 0.125, 0.25]
 
 # For batch size
 best_returns_bs = []
@@ -23,9 +23,9 @@ for bs in batch_sizes_cem:
         # Get average return across seeds for this combination
         returns_this_combo = []
         valid_seeds = []
-        for s in [3, 4, 5, 6, 7, 8, 9, 10]:
+        for s in [0, 1, 2]:
             try:
-                a = np.load(f"results_sweep/full_results_cem_elite_prop{prop}_batch_size{bs}_seed{s}.npy")
+                a = np.load(f"results_sweep/results_cem_elite_prop{prop}_batch_size{bs}_seed{s}.npy")
                 if np.all(~np.isnan(a[:, 1]) & ~np.isinf(a[:, 1]) & (a[:, 1] < 0)):
                     returns_this_combo.append(a[-1, 1])
                     valid_seeds.append(s)
@@ -48,9 +48,9 @@ for ep in elite_props:
     for bs in batch_sizes_cem:
         # Get average return across seeds for this combination
         returns_this_combo = []
-        for s in [3, 4, 5, 6, 7, 8, 9, 10]:
+        for s in [0, 1, 2]:
             try:
-                a = np.load(f"results_sweep/full_results_cem_elite_prop{ep}_batch_size{bs}_seed{s}.npy")
+                a = np.load(f"results_sweep/results_cem_elite_prop{ep}_batch_size{bs}_seed{s}.npy")
                 if np.all(~np.isnan(a[:, 1]) & ~np.isinf(a[:, 1]) & (a[:, 1] < 0)):
                     returns_this_combo.append(a[-1, 1])
             except FileNotFoundError:
@@ -65,7 +65,7 @@ axes_cem[1].set_ylabel('Best Final Return', fontsize=16)
 axes_cem[1].grid(True)
 
 # REINFORCE analysis
-batch_sizes_reinforce = [1, 2, 4, 8, 16, 32]
+batch_sizes_reinforce = [4, 8, 16, 32, 64, 128]
 learning_rates = [0.0001, 0.001, 0.01, 0.1]
 
 # For batch size
@@ -75,9 +75,9 @@ for bs in batch_sizes_reinforce:
     for lr in learning_rates:
         for clip in [True]:
             returns_this_combo = []
-            for s in [3, 4, 5, 6, 7, 8, 9, 10]:
+            for s in [0, 1, 2]:
                 try:
-                    filename = f"results_sweep/full_results_reinforce_lr{lr}_batch_size{bs}_clip{clip}_seed{s}.npy"
+                    filename = f"results_sweep/results_reinforce_lr{lr}_batch_size{bs}_clip{clip}_seed{s}.npy"
                     a = np.load(filename)
                     if np.all(~np.isnan(a[:, 1]) & ~np.isinf(a[:, 1]) & (a[:, 1] < 0)):
                         returns_this_combo.append(a[-1, 1])
@@ -100,9 +100,9 @@ for lr in learning_rates:
     for bs in batch_sizes_reinforce:
         for clip in [True]:
             returns_this_combo = []
-            for s in [3, 4, 5, 6, 7, 8, 9, 10]:
+            for s in [0, 1, 2]:
                 try:
-                    filename = f"results_sweep/full_results_reinforce_lr{lr}_batch_size{bs}_clip{clip}_seed{s}.npy"
+                    filename = f"results_sweep/results_reinforce_lr{lr}_batch_size{bs}_clip{clip}_seed{s}.npy"
                     a = np.load(filename)
                     if np.all(~np.isnan(a[:, 1]) & ~np.isinf(a[:, 1]) & (a[:, 1] < 0)):
                         returns_this_combo.append(a[-1, 1])
