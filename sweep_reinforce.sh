@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # Arrays of parameters to sweep
-seeds=(21 22 23 24 25 26 27 28 29 30)
-batch_sizes=(2 4 8 16 32)
-learning_rates=(0.0001 0.001 0.01)
+seeds=(31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48)
+batch_sizes=(32)
+learning_rates=(0.01)
 
 # Create a logs directory if it doesn't exist
 mkdir -p logs
