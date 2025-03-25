@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Arrays of parameters to sweep
-seeds=(11 12 13 14 15 16 17)
+seeds=(14 15 16 17 18 19 20 21)
 n_pops=(16 32 64 128 256)
 elite_props=(0.125 0.250)
 
