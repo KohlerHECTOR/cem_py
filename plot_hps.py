@@ -37,7 +37,7 @@ for bs in batch_sizes_cem:
 
 axes_cem[0].plot(batch_sizes_cem, best_returns_bs, 'o-', linewidth=3)
 axes_cem[0].set_xlabel('Batch Size', fontsize=16)
-axes_cem[0].set_ylabel('Best Final Return', fontsize=16)
+axes_cem[0].set_ylabel('Best Final Return - 60% Step - 3 Seeds', fontsize=16)
 axes_cem[0].set_xscale('log', base=2)
 axes_cem[0].grid(True)
 
@@ -61,7 +61,7 @@ for ep in elite_props:
 
 axes_cem[1].plot(elite_props, best_returns_ep, 'o-', linewidth=3)
 axes_cem[1].set_xlabel('Elite Proportion', fontsize=16)
-axes_cem[1].set_ylabel('Best Final Return', fontsize=16)
+axes_cem[1].set_ylabel('Best Final Return - 60% Step - 3 Seeds', fontsize=16)
 axes_cem[1].grid(True)
 
 # REINFORCE analysis
@@ -89,7 +89,7 @@ for bs in batch_sizes_reinforce:
 
 axes_reinforce[0].plot(batch_sizes_reinforce, best_returns_bs, 'o-', linewidth=3)
 axes_reinforce[0].set_xlabel('Batch Size', fontsize=16)
-axes_reinforce[0].set_ylabel('Best Final Return', fontsize=16)
+axes_reinforce[0].set_ylabel('Best Final Return - 60% Step - 3 Seeds', fontsize=16)
 axes_reinforce[0].set_xscale('log', base=2)
 axes_reinforce[0].grid(True)
 
@@ -114,7 +114,7 @@ for lr in learning_rates:
 
 axes_reinforce[1].plot(learning_rates, best_returns_lr, 'o-', linewidth=3)
 axes_reinforce[1].set_xlabel('Learning Rate', fontsize=16)
-axes_reinforce[1].set_ylabel('Best Final Return', fontsize=16)
+axes_reinforce[1].set_ylabel('Best Final Return - 60% Step - 3 Seeds', fontsize=16)
 axes_reinforce[1].set_xscale('log')
 axes_reinforce[1].grid(True)
 
@@ -127,8 +127,8 @@ style_axes(axes_reinforce[1])
 # Save the figures
 plt.figure(fig_cem.number)
 plt.tight_layout()
-plt.savefig("cem_hyperparameters.pdf", bbox_inches='tight', dpi=300)
+plt.savefig("cem_hyperparameters.png", bbox_inches='tight', dpi=300)
 
 plt.figure(fig_reinforce.number)
 plt.tight_layout()
-plt.savefig("reinforce_hyperparameters.pdf", bbox_inches='tight', dpi=300)
+plt.savefig("reinforce_hyperparameters.png", bbox_inches='tight', dpi=300)
