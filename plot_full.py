@@ -16,13 +16,13 @@ rcParams['ps.fonttype'] = 42
 rc('text', usetex=False)
 
 # Create figure with subplots
-fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5), sharey=True)
-axes = [ax1, ax2]
+fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(18, 5), sharey=True)
+axes = [ax1, ax2, ax3]
 
 # Process CEM results with updated styling
 cem_curves = []  # Store (final_return, plot_data) for alpha calculation
 success, fail = 0, 0
-for p in [16, 32, 64, 128, 256]:
+for p in [16, 32, 64, 128]:
     for prop in [0.125, 0.25]:
         to_plot_x = []
         to_plot_y = []
@@ -39,13 +39,19 @@ for p in [16, 32, 64, 128, 256]:
                 fail += 1
                 continue
         if to_plot_x and to_plot_y:
+            n = len(to_plot_y)
             y_mean = np.mean(to_plot_y, axis=0)
-            # Calculate 90% confidence intervals (5th and 95th percentiles)
-            y_lower = np.percentile(to_plot_y, 5, axis=0)
-            y_upper = np.percentile(to_plot_y, 95, axis=0)
+            y_std = np.std(to_plot_y, axis=0)
+            y_sem = y_std / np.sqrt(n)
+            # For 90% CI with normal distribution, use z=1.645
+            z = 1.645
+            y_lower = y_mean - z * y_sem
+            y_upper = y_mean + z * y_sem
             final_return = y_mean[-1]
             plot_data = (np.mean(to_plot_x, axis=0), y_mean, y_lower, y_upper)
             cem_curves.append((final_return, plot_data))
+            if p == 128 and prop == 0.125:  # This is our target configuration
+                best_cem_data = (np.mean(to_plot_x, axis=0), y_mean, y_lower, y_upper)
 print(success / (fail+success))
 
 
@@ -93,12 +99,18 @@ for bs in [2, 4, 8, 16, 32]:
             if to_plot_x and to_plot_y:
                 y_mean = np.mean(to_plot_y, axis=0)
                 test_mean = np.mean(to_plot_test, axis=0)
-                # Calculate 90% confidence intervals (5th and 95th percentiles)
-                y_lower = np.percentile(to_plot_test, 5, axis=0)
-                y_upper = np.percentile(to_plot_test, 95, axis=0)
-                final_return = y_mean[-1]
+                n = len(to_plot_test)
+                y_std = np.std(to_plot_test, axis=0) 
+                y_sem = y_std / np.sqrt(n)
+                # For 90% CI with normal distribution, use z=1.645
+                z = 1.645
+                y_lower = test_mean - z * y_sem
+                y_upper = test_mean + z * y_sem
+                final_return = test_mean[-1]
                 plot_data = (np.mean(to_plot_x, axis=0), y_mean, y_lower, y_upper, test_mean)
                 reinforce_curves.append((final_return, plot_data))
+                if bs == 32 and lr == 0.01:  # This is our target configuration
+                    best_reinforce_data = (np.mean(to_plot_x, axis=0), y_mean, y_lower, y_upper, test_mean)
 print(success / (fail+success))
 
 # Plot REINFORCE curves with normalized alphas based on final returns
@@ -113,12 +125,30 @@ if reinforce_curves:
         y_downsampled = y[indices]
         # y_lower_downsampled = y_lower[indices]
         # y_upper_downsampled = y_upper[indices]
-        ax2.plot(x_downsampled, y_downsampled, c='#7F7FFF', alpha=1, linewidth=2, linestyle="dotted")
+        # ax2.plot(x_downsampled, y_downsampled, c='#7F7FFF', alpha=1, linewidth=2, linestyle="dotted")
         ax2.plot(x_downsampled, test_mean, c='#7F7FFF', alpha=1, linewidth=2)
         ax2.fill_between(x_downsampled, y_lower, y_upper, color='#7F7FFF', alpha=0.2)
 
+# Plot best curves in third subplot
+if best_cem_data:
+    x, y, y_lower, y_upper = best_cem_data
+    indices = np.linspace(0, len(x) - 1, 100).astype(int)
+    x_downsampled = x[indices]
+    y_downsampled = y[indices]
+    y_lower_downsampled = y_lower[indices]
+    y_upper_downsampled = y_upper[indices]
+    ax3.plot(x_downsampled, y_downsampled, c='#FF7F7F', alpha=1, linewidth=2, label='CEM (b=128, e=0.125)')
+    ax3.fill_between(x_downsampled, y_lower_downsampled, y_upper_downsampled, color='#FF7F7F', alpha=0.2)
+
+if best_reinforce_data:
+    x, y, y_lower, y_upper, test_mean = best_reinforce_data
+    indices = np.linspace(0, len(x) - 1, 100).astype(int)
+    x_downsampled = x[indices]
+    ax3.plot(x_downsampled, test_mean, c='#7F7FFF', alpha=1, linewidth=2, label='REINFORCE (b=32, lr=0.01)')
+    ax3.fill_between(x_downsampled, y_lower, y_upper, color='#7F7FFF', alpha=0.2)
+
 # Style each subplot
-for ax, title in zip(axes, ['CEM', 'REINFORCE']):
+for ax, title in zip(axes, ['CEM', 'REINFORCE', 'Best Configurations']):
     ax.grid(True, alpha=0.7)
     ax.spines['right'].set_visible(False)
     ax.spines['top'].set_visible(False)
@@ -135,6 +165,9 @@ legend_elements = [
     Line2D([0], [0], color='#FF7F7F', label='CEM', linewidth=2),
     Line2D([0], [0], color='#7F7FFF', label='REINFORCE', linewidth=2),
 ]
+
+# Add legend to the third subplot
+ax3.legend(fontsize=10)
 
 plt.tight_layout()
 # Adjust layout to make room for legend
