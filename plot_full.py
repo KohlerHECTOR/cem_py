@@ -41,8 +41,8 @@ for p in [16, 32, 64, 128, 256]:
         if to_plot_x and to_plot_y:
             y_mean = np.mean(to_plot_y, axis=0)
             # Calculate 90% confidence intervals (5th and 95th percentiles)
-            y_lower = np.percentile(to_plot_y, 25, axis=0)
-            y_upper = np.percentile(to_plot_y, 75, axis=0)
+            y_lower = np.percentile(to_plot_y, 5, axis=0)
+            y_upper = np.percentile(to_plot_y, 95, axis=0)
             final_return = y_mean[-1]
             plot_data = (np.mean(to_plot_x, axis=0), y_mean, y_lower, y_upper)
             cem_curves.append((final_return, plot_data))
@@ -62,20 +62,23 @@ if cem_curves:
         y_lower_downsampled = y_lower[indices]
         y_upper_downsampled = y_upper[indices]
         ax1.plot(x_downsampled, y_downsampled, c='#FF7F7F', alpha=1, linewidth=2)
-        # ax1.fill_between(x_downsampled, y_lower_downsampled, y_upper_downsampled, color='#FF7F7F', alpha=0.2)
+        ax1.fill_between(x_downsampled, y_lower_downsampled, y_upper_downsampled, color='#FF7F7F', alpha=0.2)
 
 # Process REINFORCE results with updated styling
 reinforce_curves = []
+test_curves = []
 success, fail = 0, 0
 
-for bs in [4, 8, 16, 32]:
+for bs in [2, 4, 8, 16, 32]:
     for lr in [0.0001, 0.001, 0.01]:
         for clip in [True]:
             to_plot_x = []
             to_plot_y = []
-            for s in [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]:
+            to_plot_test = []
+            for s in [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24]:
                 try:
                     a = np.load(f"results_sweep/full_results_reinforce_lr{lr}_batch_size{bs}_clip{clip}_seed{s}.npy")
+                    b = np.array(list(np.load(f"test_scores/full_results_reinforce_lr{lr}_batch_size{bs}_clip{clip}_seed{s}_weights_test_scores.npy", allow_pickle=True).item()))[:,0]
                     valid_mask = ~(np.isnan(a[:, 1]) | np.isinf(a[:, 1])) & (a[:, 1] < 0)
                     if not np.all(valid_mask):
                         print("oops")
@@ -83,15 +86,18 @@ for bs in [4, 8, 16, 32]:
                     success += 1
                     to_plot_y.append(a[:,1])
                     to_plot_x.append(a[:,0])
+                    to_plot_test.append(b)
                 except FileNotFoundError:
                     fail += 1
                     continue
             if to_plot_x and to_plot_y:
                 y_mean = np.mean(to_plot_y, axis=0)
-                y_lower = np.percentile(to_plot_y, 25, axis=0)
-                y_upper = np.percentile(to_plot_y, 75, axis=0)
+                test_mean = np.mean(to_plot_test, axis=0)
+                # Calculate 90% confidence intervals (5th and 95th percentiles)
+                y_lower = np.percentile(to_plot_test, 5, axis=0)
+                y_upper = np.percentile(to_plot_test, 95, axis=0)
                 final_return = y_mean[-1]
-                plot_data = (np.mean(to_plot_x, axis=0), y_mean, y_lower, y_upper)
+                plot_data = (np.mean(to_plot_x, axis=0), y_mean, y_lower, y_upper, test_mean)
                 reinforce_curves.append((final_return, plot_data))
 print(success / (fail+success))
 
@@ -100,15 +106,16 @@ if reinforce_curves:
     returns = np.array([r for r, _ in reinforce_curves])
     min_return = np.min(returns)
     max_return = np.max(returns)
-    for final_return, (x, y, y_lower, y_upper) in reinforce_curves:
+    for final_return, (x, y, y_lower, y_upper, test_mean) in reinforce_curves:
         # Downsample to 100 points
         indices = np.linspace(0, len(x) - 1, 100).astype(int)
         x_downsampled = x[indices]
         y_downsampled = y[indices]
-        y_lower_downsampled = y_lower[indices]
-        y_upper_downsampled = y_upper[indices]
+        # y_lower_downsampled = y_lower[indices]
+        # y_upper_downsampled = y_upper[indices]
         ax2.plot(x_downsampled, y_downsampled, c='#7F7FFF', alpha=1, linewidth=2, linestyle="dotted")
-        # ax2.fill_between(x_downsampled, y_lower_downsampled, y_upper_downsampled, color='#7F7FFF', alpha=0.2)
+        ax2.plot(x_downsampled, test_mean, c='#7F7FFF', alpha=1, linewidth=2)
+        ax2.fill_between(x_downsampled, y_lower, y_upper, color='#7F7FFF', alpha=0.2)
 
 # Style each subplot
 for ax, title in zip(axes, ['CEM', 'REINFORCE']):
