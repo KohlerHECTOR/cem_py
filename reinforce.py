@@ -25,10 +25,8 @@ def reinforce(lr=0.01, batch_size=64, clip=False, seed=0):
     all_trajs = np.zeros((num_iterations, batch_size), dtype=trajectory_dtype)
 
     results = []
-    save_weights = np.zeros((num_iterations, w1.size + w2.size + w3.size + b1.size + b2.size + b3.size))
-
+    test_scores = np.zeros(num_iterations)
     for iteration in range(num_iterations):
-        save_weights[iteration] = np.concatenate([p.flatten() for p in (w1, b1, w2, b2, w3, b3)])
         # Collect n_evals trajectories for each environment in parallel
         all_trajs[iteration] = Parallel(n_jobs=-1)(
             delayed(collect_trajectory)(
@@ -130,8 +128,16 @@ def reinforce(lr=0.01, batch_size=64, clip=False, seed=0):
         w1 = w1 + lr * grad_w1
         b1 = b1 + lr * grad_b1
 
-    np.save(f"full_results_reinforce_lr{lr}_batch_size{batch_size}_clip{clip}_seed{seed}.npy", results)
-    np.save(f"full_results_reinforce_lr{lr}_batch_size{batch_size}_clip{clip}_seed{seed}_weights.npy", save_weights)
+        eval_trajs = Parallel(n_jobs=-1)(
+            delayed(collect_trajectory)(
+                make("Pendulum-v1"), (w1, b1, w2, b2, w3, b3), deterministic=True
+            )
+            for e in range(50)
+        )
+        test_scores[iteration] = get_score_batch(eval_trajs)
+    np.save(f"full_results_reinforce_lr{lr}_batch_size{batch_size}_clip{clip}_seed{seed}_train_scores.npy", results)
+    np.save(f"full_results_reinforce_lr{lr}_batch_size{batch_size}_clip{clip}_seed{seed}_test_scores.npy", test_scores)
+    
     for env in envs:
         env.close()
 
